@@ -1,9 +1,11 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const port = process.env.PORT || 5000;
 
+// middleware
 app.use(cors());
 app.use(express.json());
 
@@ -23,10 +25,19 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
     const userCollection = client.db("newspaperDB").collection("users")
-
+    //get  all users
+    app.get("/users", async(req, res)=>{
+      const users = await userCollection.find().toArray()
+      res.send(users)
+    })
     // new users
     app.post("/users", async (req, res) => {
       const newUser = req.body;
+      const query = {email: newUser.email};
+      const exitingUser = await userCollection.findOne(query);
+      if(exitingUser){
+        return res.send({message: "user already exit", insertedId: null})
+      }
       const result = await userCollection.insertOne(newUser)
       res.send(result);
     })
