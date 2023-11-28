@@ -51,11 +51,21 @@ async function run() {
         req.decoded = decoded;
         next()
       })
+    }
 
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      const isAdmin = user.role === "admin";
+      if (!isAdmin) {
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+      next()
     }
 
     //get  all users
-    app.get("/users", verifyToken, async (req, res) => {
+    app.get("/users", verifyToken, verifyAdmin, async (req, res) => {
       const users = await userCollection.find().toArray()
       res.send(users)
     })
@@ -72,7 +82,7 @@ async function run() {
     })
 
     // make admin
-    app.patch("/users/admin/:id", async (req, res) => {
+    app.patch("/users/admin/:id", verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) }
       const updatedDoc = {
@@ -83,10 +93,12 @@ async function run() {
       const result = await userCollection.updateOne(filter, updatedDoc);
       res.send(result)
     })
+    
+    
 
     // delete user
 
-    app.delete("/users/:id", async (req, res) => {
+    app.delete("/users/:id", verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await userCollection.deleteOne(query)
