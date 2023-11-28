@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -26,20 +26,42 @@ async function run() {
     // await client.connect();
     const userCollection = client.db("newspaperDB").collection("users")
     //get  all users
-    app.get("/users", async(req, res)=>{
+    app.get("/users", async (req, res) => {
       const users = await userCollection.find().toArray()
       res.send(users)
     })
     // new users
     app.post("/users", async (req, res) => {
       const newUser = req.body;
-      const query = {email: newUser.email};
+      const query = { email: newUser.email };
       const exitingUser = await userCollection.findOne(query);
-      if(exitingUser){
-        return res.send({message: "user already exit", insertedId: null})
+      if (exitingUser) {
+        return res.send({ message: "user already exit", insertedId: null })
       }
       const result = await userCollection.insertOne(newUser)
       res.send(result);
+    })
+
+    // make admin
+    app.patch("/users/admin/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const updatedDoc = {
+        $set: {
+          role: "admin"
+        }
+      }
+      const result = await userCollection.updateOne(filter, updatedDoc);
+      res.send(result)
+    })
+
+    // delete user
+
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await userCollection.deleteOne(query)
+      res.send(result)
     })
 
     // Send a ping to confirm a successful connection
