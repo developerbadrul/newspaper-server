@@ -30,13 +30,23 @@ async function run() {
     //create jwt
     app.post("/jwt", (req, res) => {
       const user = req.body;
+      console.log("user in ganerate token", user);
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
-      // console.log(token);
+      console.log({ token });
       res.send({ token })
     })
 
+    // middlewares 
+    const verifyToken = (req, res, next) => {
+      console.log("inside verify token", req.headers.authorization);
+      if (!req.headers.authorization) {
+        return res.status(401).send({ message: 'unauthorized access' });
+      }
+      next()
+    }
+
     //get  all users
-    app.get("/users", async (req, res) => {
+    app.get("/users", verifyToken, async (req, res) => {
       const users = await userCollection.find().toArray()
       res.send(users)
     })
