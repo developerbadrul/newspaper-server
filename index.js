@@ -42,7 +42,16 @@ async function run() {
       if (!req.headers.authorization) {
         return res.status(401).send({ message: 'unauthorized access' });
       }
-      next()
+      const token = req.headers.authorization.split(" ")[1];
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+          return res.status(401).send({ message: 'unauthorized access' })
+        }
+        // console.log("inside verify jwt", "decoded :", decoded, "req.decoded :" req.decoded);
+        req.decoded = decoded;
+        next()
+      })
+
     }
 
     //get  all users
