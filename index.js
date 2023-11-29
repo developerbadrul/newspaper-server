@@ -82,7 +82,7 @@ async function run() {
     })
 
     // add publisher 
-    app.post("/users/publisher", async(req, res)=>{
+    app.post("/users/publisher", async (req, res) => {
       const newPublisher = req.body;
       const result = await userCollection.insertOne(newPublisher)
       res.send(result)
@@ -99,6 +99,13 @@ async function run() {
       }
       const result = await userCollection.updateOne(filter, updatedDoc);
       res.send(result)
+    })
+
+    //get  all publisher
+    app.get("/publisher", async (req, res) => {
+      const query = { role: "publisher" }
+      const users = await userCollection.find(query).toArray()
+      res.send(users)
     })
 
     // send user control
