@@ -81,6 +81,13 @@ async function run() {
       res.send(result);
     })
 
+    // add publisher 
+    app.post("/users/publisher", async(req, res)=>{
+      const newPublisher = req.body;
+      const result = await userCollection.insertOne(newPublisher)
+      res.send(result)
+    })
+
     // make admin
     app.patch("/users/admin/:id", verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
