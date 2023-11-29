@@ -97,7 +97,8 @@ async function run() {
     // send user control
     app.get("/users/admin/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
-      console.log("check FontEnd Email", req.decoded.email);
+      console.log("check email param", email);
+      console.log("check decode Email", req.decoded.email);
       if (email !== req.decoded.email) {
         return res.status(403).send({ message: 'forbidden access' });
       }
@@ -108,7 +109,7 @@ async function run() {
       if (user) {
         admin = user?.role === "admin"
       }
-      return { admin }
+      res.send({ admin });
     })
 
     // delete user
