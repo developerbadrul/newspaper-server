@@ -30,15 +30,15 @@ async function run() {
     //create jwt
     app.post("/jwt", (req, res) => {
       const user = req.body;
-      console.log("user in ganerate token", user);
+      // console.log("user in ganerate token", user);
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
-      console.log({ token });
+      // console.log({ token });
       res.send({ token })
     })
 
     // middlewares 
     const verifyToken = (req, res, next) => {
-      console.log("inside verify token", req.headers.authorization);
+      // console.log("inside verify token", req.headers.authorization);
       if (!req.headers.authorization) {
         return res.status(401).send({ message: 'unauthorized access' });
       }
@@ -97,8 +97,8 @@ async function run() {
     // send user control
     app.get("/users/admin/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
-      console.log("check email param", email);
-      console.log("check decode Email", req.decoded.email);
+      // console.log("check email param", email);
+      // console.log("check decode Email", req.decoded.email);
       if (email !== req.decoded.email) {
         return res.status(403).send({ message: 'forbidden access' });
       }
