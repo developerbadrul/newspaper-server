@@ -108,6 +108,13 @@ async function run() {
       res.send(users)
     })
 
+    // get general user
+    app.get("/general/user", async (req, res) => {
+      const query = { type: { $ne: "premium" } }
+      const result = await userCollection.find(query).toArray()
+      res.send(result);
+    })
+
     // send user control
     app.get("/users/admin/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
@@ -125,6 +132,17 @@ async function run() {
       }
       res.send({ admin });
     })
+
+    // all user Count
+    app.get("/users/count", async (req, res) => {
+      const userCount = await userCollection.countDocuments();
+      res.send({ userCount })
+    })
+    // count all premium user
+    app.get("/users/premium", async (req, res) => {
+      const premiumUserCount = await userCollection.countDocuments({ type: "premium" });
+      res.send({ premiumUserCount });
+    });
 
     // delete user
 
