@@ -163,7 +163,6 @@ async function run() {
       res.send(result)
     })
     
-
     // delete user
 
     app.delete("/users/:id", verifyToken, verifyAdmin, async (req, res) => {
