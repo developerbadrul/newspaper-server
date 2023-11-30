@@ -26,6 +26,7 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
     const userCollection = client.db("newspaperDB").collection("users")
+    const articlesCollection = client.db("newspaperDB").collection("articles")
 
     //create jwt
     app.post("/jwt", (req, res) => {
@@ -143,6 +144,25 @@ async function run() {
       const premiumUserCount = await userCollection.countDocuments({ type: "premium" });
       res.send({ premiumUserCount });
     });
+
+    // get all artical
+    app.get("/allartical", async (req, res) => {
+      try {
+          const result = await articlesCollection.find().toArray();
+          res.send(result);
+      } catch (error) {
+          console.error('Error fetching all articles:', error);
+          res.status(500).send({ error: 'Internal Server Error' });
+      }
+  });
+
+    //add Artical
+    app.post("/addartical", async(req,res)=>{
+      const newArticle = req.body;
+      const result = articlesCollection.insertOne(newArticle);
+      res.send(result)
+    })
+    
 
     // delete user
 
